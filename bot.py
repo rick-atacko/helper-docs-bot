@@ -6,6 +6,8 @@ from aiogram.filters import CommandStart
 from aiogram.types import Message
 from dotenv import load_dotenv
 
+from documents import DOCUMENTS
+
 load_dotenv()
 
 TOKEN = os.getenv("BOT_TOKEN")
@@ -21,6 +23,30 @@ async def start_handler(message: Message):
         "Я Helper Docs Bot.\n"
         "Помогу найти документы, ответить на вопросы и напомнить о дедлайнах."
     )
+
+
+@dp.message()
+async def search_handler(message: Message):
+    text = message.text.lower()
+
+    if text.startswith("найди "):
+        query = text.replace("найди ", "").strip()
+
+        result = None
+
+        for key, doc in DOCUMENTS.items():
+            if query in key.lower():
+                result = doc
+                break
+
+        if result:
+            await message.answer(
+                f"Найден документ:\n\n"
+                f"{result['title']}\n"
+                f"{result['description']}"
+            )
+        else:
+            await message.answer("Документ не найден.")
 
 
 async def main():
